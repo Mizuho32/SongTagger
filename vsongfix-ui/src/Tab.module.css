@@ -1,0 +1,43 @@
+/* https://zenn.dev/u_10/articles/cc852509ff92f1 */
+
+.header {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  box-shadow: var(--background-gray) 0 -1px 0 0 inset;
+}
+
+.column {
+  width: fit-content;
+}
+
+.button {
+  width: 100%;
+  padding: 0.5rem 1.5rem;
+  font-weight: bold;
+  color: var(--font-gray);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+}
+
+.active {
+  color: var(--background-blue);
+  background-color: var(--background-white);
+  border-bottom: 3px solid var(--background-blue);
+}
+
+.tabBody {
+  padding: 0.25rem;
+}
+
+/* storybook用css */
+.hasIcon {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
