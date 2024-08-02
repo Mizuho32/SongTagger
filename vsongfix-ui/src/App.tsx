@@ -12,6 +12,17 @@ import 'react-h5-audio-player/lib/styles.css';
 
 import axios from "axios"
 
+function escapeCSVValue(value: string | number): string {
+  if (typeof value === "number") return `${value}`
+
+  if (!value) return ""
+  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
+    // ダブルクォートで囲み、内部のダブルクォートをエスケープ
+    value = '"' + value.replace(/"/g, '""') + '"';
+  }
+  return value;
+}
+
 function App() {
   const ident = location.search
   const [songList, setSongList] = useState<Song[]>([]);
@@ -40,8 +51,15 @@ function App() {
     fetchData();
   }, []);
 
+  function toText() {
+    return appState.songList.map(song => {
+      return [song.title, song.artist, song.start, song.end].map(escapeCSVValue).join(",")
+    }).join("\n")
+  }
+  /*
   const clickState = {count: 0}
   const [count, setCount] = useState(clickState)
+  */
 
   return (
     <>
@@ -73,21 +91,23 @@ function App() {
       
       <div id="main">
         <div id="tabs">
-        <Tab defaultKey="mainTab">
-          <TabItem tabKey="loadTab" label="データ読み込み">
-            <h1>Hello</h1>
-          </TabItem>
-          <TabItem tabKey="mainTab" label="タグ付け">
-              <div id="songListContainer">
-                <SongList appState={appState} isMobile={false} />
-              </div>
+          <Tab defaultKey="mainTab">
 
-          </TabItem>
+            <TabItem tabKey="loadTab" label="データ読み込み">
+              <h1>Hello</h1>
+            </TabItem>
 
-          <TabItem tabKey="outputTab" label="データ出力">
-            <h1>Output</h1>
-          </TabItem>
-        </Tab>
+            <TabItem tabKey="mainTab" label="タグ付け">
+                <div id="songListContainer">
+                  <SongList appState={appState} isMobile={false} />
+                </div>
+            </TabItem>
+
+            <TabItem tabKey="outputTab" label="データ出力">
+              <textarea value={toText()} readOnly={true}></textarea>
+            </TabItem>
+
+          </Tab>
         </div>
         <div id="search"></div>
       </div>

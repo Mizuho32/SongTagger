@@ -4,6 +4,13 @@ table th {
   left: 0;
   z-index: 1;
 }
+
+button.songlist.add {
+  padding: 0;
+  height: 100%;
+  width: 2em;
+}
+
 /*
 #root {
   max-width: 1280px;
