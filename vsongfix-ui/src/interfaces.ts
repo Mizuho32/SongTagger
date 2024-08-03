@@ -7,9 +7,14 @@ export interface Song {
 }
 
 export interface AppState {
+    filename: string
+    artist: string
     songList: Song[]
-    setSongList: React.Dispatch<React.SetStateAction<Song[]>>
     audioEl?: HTMLAudioElement
+
+    setSongList: React.Dispatch<React.SetStateAction<Song[]>>
+    setFilename: React.Dispatch<React.SetStateAction<string>>
+    setArtist: React.Dispatch<React.SetStateAction<string>>
 }
 
 export default Song
