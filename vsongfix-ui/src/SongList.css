@@ -1,14 +1,32 @@
-table th {
+table thead {
   position: sticky;
   top:0;
   left: 0;
   z-index: 1;
 }
 
+div.songlist.control {
+  position: sticky;
+}
+
+button.songlist.control {
+  margin: 0.2em;
+}
+
 button.songlist.add {
   padding: 0;
   height: 100%;
   width: 2em;
+}
+
+#tabs > ul {
+  flex: 0;
+}
+#tabs > div {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /*
