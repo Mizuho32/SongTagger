@@ -5,56 +5,44 @@ import './App.css'
 import SongList from './SongList'
 import {Song, AppState} from './interfaces'
 import {Tab, TabItem} from './Tab'
+import * as songUtils from './songUtils'
 
 
 import ReactAudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
-import axios from "axios"
-
-function escapeCSVValue(value: string | number): string {
-  if (typeof value === "number") return `${value}`
-
-  if (!value) return ""
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    // ダブルクォートで囲み、内部のダブルクォートをエスケープ
-    value = '"' + value.replace(/"/g, '""') + '"';
-  }
-  return value;
-}
 
 function App() {
   const ident = location.search
+  const urlParams = new URLSearchParams(location.search)
   const [songList, setSongList] = useState<Song[]>([]);
   const [audioEl, setAudioEl] = useState<HTMLAudioElement>()
-  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl}
+  const [artist, setArtist] = useState(urlParams.get("artist") || "")
+  const [filename, setFilename] = useState(urlParams.get("filename") || "")
+  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl, artist: artist, setArtist: setArtist, filename: filename, setFilename: setFilename}
   const player = useRef<ReactAudioPlayer>(null)
 
   useEffect(() => {
+    // Get audio
     const tmp = player.current?.audio.current
     if (tmp) {
       setAudioEl(tmp)
     }
-    const fetchData = async () => {
-      try {
-        const results = await axios.get<Song[]>(`/api/detections${ident}`);
-        if (results.status === 200) {
 
-          console.log(results.data)
-          setSongList(results.data);
-        }
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-
-    fetchData();
+    songUtils.fetchDetections(appState)
   }, []);
 
   function toText() {
     return appState.songList.map(song => {
-      return [song.title, song.artist, song.start, song.end].map(escapeCSVValue).join(",")
+      return [song.start, song.end, song.title, song.artist].map(songUtils.escapeCSVValue).join(",")
     }).join("\n")
+  }
+
+  function loadButtonHandler(tagged: boolean) {
+    const ret = confirm("現在のデータは破棄されます")
+    if (ret) {
+      songUtils.fetchDetections(appState, tagged)
+    }
   }
   /*
   const clickState = {count: 0}
@@ -94,13 +82,18 @@ function App() {
           <Tab defaultKey="mainTab">
 
             <TabItem tabKey="loadTab" label="データ読み込み">
-              <h1>Hello</h1>
+              <div className='load controls' >
+                <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(false)}>
+                  Load Detections
+                </button>
+                <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(true)}>
+                  Load Tagged
+                </button>
+              </div>
             </TabItem>
 
             <TabItem tabKey="mainTab" label="タグ付け">
-                <div id="songListContainer">
-                  <SongList appState={appState} isMobile={false} />
-                </div>
+              <SongList appState={appState} isMobile={false} />
             </TabItem>
 
             <TabItem tabKey="outputTab" label="データ出力">
@@ -119,5 +112,7 @@ function App() {
     </>
   )
 }
+
+
 
 export default App
