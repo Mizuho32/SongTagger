@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import {Time, to_time, to_num} from './Time'
 import './SongList.css'
+
 import {Song, AppState} from './interfaces'
+import * as songUtils from './songUtils'
 
 interface SongListProps {
   appState: AppState
@@ -182,9 +184,11 @@ function SongList(props: SongListProps) {
   } else {
     return (
       <>
-        <div>
-          <button type="button" onMouseUp={e=>onDelete()}>Delete</button>
-        </div>
+      <div className='songlist controls'>
+        <button type="button" className="songlist control" onMouseUp={e => onDelete()}>Delete</button>
+        <button type="button" className="songlist control" onMouseUp={e => songUtils.uploadSongs(props.appState)}>Submit</button>
+      </div>
+      <div id="songListContainer">
         <table className="tablecss">
           <thead>
             <tr>
@@ -218,6 +222,7 @@ function SongList(props: SongListProps) {
             
           </tbody>
         </table>
+      </div>
       </>
     )
   }
