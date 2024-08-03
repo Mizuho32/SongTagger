@@ -12,6 +12,13 @@ export default defineConfig({
         target: 'http://mouse.rimo:8000', // APIサーバーのURL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '') // /apiを除去する場合
+      },
+      // WebSocketのプロキシ設定
+      '/api/websocket': {
+        target: 'ws://mouse.rimo:8001/websocket',
+        ws: true,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/websocket/, '')
       }
     }
   }
