@@ -1,0 +1,31 @@
+table thead {
+  position: sticky;
+  top:0;
+  left: 0;
+  z-index: 1;
+}
+
+div.streamlist.control {
+  position: sticky;
+}
+
+button.streamlist.control {
+  margin: 0.2em;
+}
+
+#streamListContainer {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+}
+
+#tabs > ul {
+  flex: 0;
+}
+#tabs > div {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

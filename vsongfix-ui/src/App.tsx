@@ -3,34 +3,76 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import SongList from './SongList'
-import {Song, AppState} from './interfaces'
+import StreamList from './StreamList'
+import {Song, Stream, AppState} from './interfaces'
 import {Tab, TabItem} from './Tab'
 import * as songUtils from './songUtils'
 
 
 import ReactAudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
+import Spinner from 'react-spinner-material';
+import { useCookies } from "react-cookie";
+import { initSession } from './utils'
 
 
 function App() {
-  const ident = location.search
+  //const ident = location.search
   const urlParams = new URLSearchParams(location.search)
-  const [songList, setSongList] = useState<Song[]>([]);
+  const artistParam = urlParams.get("artist")
+  if (!artistParam) return
+
+  const [songList, setSongList] = useState<Song[]>([])
+  const [streamList, setStreamList] = useState<Stream[]>([])
   const [audioEl, setAudioEl] = useState<HTMLAudioElement>()
-  const [artist, setArtist] = useState(urlParams.get("artist") || "")
-  const [filename, setFilename] = useState(urlParams.get("filename") || "")
-  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl, artist: artist, setArtist: setArtist, filename: filename, setFilename: setFilename}
+  const [isBuffering, setBuffering] = useState(false)
+  let isBuffering2 = false
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const [artist, setArtist] = useState("")
+  const [filename, setFilename] = useState("")
+
+  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl, artist: artist, setArtist: setArtist, filename: filename, setFilename: setFilename, streamList: streamList, setStreamList: setStreamList, cookies: cookies, setCookie: setCookie, removeCookie: removeCookie}
+
   const player = useRef<ReactAudioPlayer>(null)
 
+
   useEffect(() => {
+
+
     // Get audio
     const tmp = player.current?.audio.current
     if (tmp) {
-      setAudioEl(tmp)
+
+      const ident = initSession(appState, artistParam, urlParams.get("filename"), tmp)
+      ident.then(_ => {
+        setAudioEl(tmp)
+
+        tmp.onwaiting = _ => {
+          setBuffering(true)
+          isBuffering2 = true
+        }
+
+        tmp.onplaying = _ => {
+          setBuffering(false)
+          isBuffering2 = false
+        }
+      })
+
+    } else {
+      alert("Failed to init audio")
     }
 
-    songUtils.fetchDetections(appState)
-  }, []);
+      /*tmp.onprogress = (e: ProgressEvent) => {
+        if (isBuffering2) {
+          const buffered = tmp.buffered;
+          console.log("Progreess")
+          for (let i = 0; i < buffered.length; i++) {
+            console.log(`Buffered range ${i}: ${buffered.start(i)} to ${buffered.end(i)}`);
+          }
+        }
+      }*/
+
+  }, [player]);
 
   function toText() {
     return appState.songList.map(song => {
@@ -78,6 +120,10 @@ function App() {
       */}
       
       <div id="main">
+        {isBuffering && (
+        <div className="spinnerContainer">
+          <Spinner color="#FFFFFF" stroke={10} radius={140} visible={true} />
+        </div>)}
         <div id="tabs">
           <Tab defaultKey="mainTab">
 
@@ -100,13 +146,17 @@ function App() {
               <textarea value={toText()} readOnly={true}></textarea>
             </TabItem>
 
+            <TabItem tabKey="streamsTab" label="歌枠リスト">
+              <StreamList appState={appState} isMobile={false} />
+            </TabItem>
+
           </Tab>
         </div>
         <div id="search"></div>
       </div>
       <footer>
         <div id="playerContainer">
-          <ReactAudioPlayer ref={player} src={`/api/audio${ident}`} />
+          <ReactAudioPlayer ref={player} />
         </div>
       </footer>
     </>

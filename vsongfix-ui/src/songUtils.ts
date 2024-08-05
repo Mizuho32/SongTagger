@@ -1,4 +1,4 @@
-import { AppState } from "./interfaces";
+import { AppState, Stream } from "./interfaces";
 import {Song} from "./interfaces"
 
 import axios from "axios"
@@ -84,8 +84,20 @@ export async function fetchDetections(appState: AppState, tagged: boolean = fals
     try {
         const results = await axios.get<Song[]>(`/api/detections${search}`);
         if (results.status === 200) {
-            console.log("dets", results.data)
+            console.log("dets", search, results.data)
             appState.setSongList(results.data);
+        }
+    } catch (error) {
+        alert(`Error fetching data\n${error}`);
+    }
+}
+
+export async function fetchStreams(appState: AppState) {
+    try {
+        const results = await axios.get<Stream[]>(`/api/songlist?artist=${appState.artist}`);
+        if (results.status === 200) {
+            console.log("songlist", results.data)
+            appState.setStreamList(results.data);
         }
     } catch (error) {
         alert(`Error fetching data\n${error}`);
