@@ -17,9 +17,14 @@ export async function initSession(appState: AppState, artist: string, filename: 
 }
 
 export async function startSession(appState: AppState, artist: string, filename: string|null = "") {
-    // FIXME?
-    appState.artist = artist
-    appState.setArtist(artist)
+    let ret = true
+    if (artist) {
+        // FIXME?
+        appState.artist = artist
+        appState.setArtist(artist)
+    } else {
+        artist = appState.artist
+    }
     let param = ""
 
     if (filename) {
@@ -38,13 +43,15 @@ export async function startSession(appState: AppState, artist: string, filename:
             await songUtils.fetchDetections(appState)
             param = `?artist=${artist}&filename=${filename}`
 
+        } else {
+            ret = false
         }
 
     }
 
     await songUtils.fetchStreams(appState)
     if (param && appState.audioEl) appState.audioEl.src = `/api/audio${param}`
-    //return param
+    return ret
 }
 
 export async function lock(artist: string, filename: string, sid: string, get: boolean) {

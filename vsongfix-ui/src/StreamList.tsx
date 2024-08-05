@@ -1,4 +1,4 @@
-import { FaLock, FaUnlock, FaRedo, FaAppStore } from 'react-icons/fa';
+import { FaLock, FaUnlock, FaRedo, FaEdit } from 'react-icons/fa';
 
 import React, { useEffect, useState } from 'react'
 import {Time, to_time, to_num} from './Time'
@@ -6,6 +6,7 @@ import './StreamList.css'
 
 import {Stream, AppState} from './interfaces'
 import * as songUtils from './songUtils'
+import { startSession } from './utils';
 
 interface StreamListProps {
   appState: AppState
@@ -65,12 +66,14 @@ function StreamList(props: StreamListProps) {
     })
   }
 
+  */
   let [hoveredElement, setHoveredElement] = useState(-1)
   function onHover(e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, idx: number) {
     if (hoveredElement != idx) {
       setHoveredElement(idx)
     }
   }
+  /*
 
   async function seekTime(state: Stream, ui: string, delta: number = 1) {
     const audioEl = props.appState.audioEl
@@ -169,6 +172,22 @@ function StreamList(props: StreamListProps) {
   }
   */
 
+  async function openSession(text: string, stream: Stream) {
+    if (stream.taggingLock) {
+      alert(`${text}は作業中です。`)
+      return
+    }
+
+    const ret = confirm(`${text}を開きます。現在の作業は破棄されます。`)
+    if (ret) {
+      const filename = stream.name + stream.extname
+      const locked = await startSession(props.appState, "", filename)
+      if (!locked) {
+        alert(`${text}は既に作業中です。`)
+      }
+    }
+  }
+
   if (props.isMobile) {
     return (
       <>
@@ -203,10 +222,17 @@ function StreamList(props: StreamListProps) {
           </thead>
           <tbody id="streams">
             {props.appState.streamList.map((stream: Stream, index: number) => (
-              <tr key={index}>
+              <tr key={index} onMouseOver={e=>onHover(e, index)}>
                 <td className="no">{index}</td>
                 <td className="title" >{nameToDate(stream.name)}</td>
-                <td className="status">{stream.taggingLock ? (<FaLock />) : (<FaUnlock />)}</td>
+                <td className="status">{stream.taggingLock ? (<FaLock />) : (<FaUnlock color="green" />)}</td>
+                <td>
+                {
+                  hoveredElement == index || (hoveredElement==-1&&index==0)?
+                  <button type="button" onMouseUp={_=>openSession(nameToDate(stream.name), stream)} className='streamlist open'><FaEdit /></button> : <div></div>
+                }
+                </td>
+
               </tr>
             ))}
             

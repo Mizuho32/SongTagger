@@ -20,6 +20,12 @@ button.streamlist.control {
   width: 100%;
 }
 
+button.streamlist.open {
+  padding: 0;
+  height: 100%;
+  width: 2em;
+}
+
 #tabs > ul {
   flex: 0;
 }

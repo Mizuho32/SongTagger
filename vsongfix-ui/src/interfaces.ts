@@ -8,7 +8,7 @@ export interface Song {
 
 export interface Stream {
     name: string
-    exitname: string
+    extname: string
     taggingLock: boolean
 }
 
