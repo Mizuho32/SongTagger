@@ -11,10 +11,14 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "nanoid": "^5.0.7",
     "react": "^18.3.1",
+    "react-cookie": "^7.2.0",
     "react-dom": "^18.3.1",
     "react-h5-audio-player": "^3.9.3",
-    "react-modern-audio-player": "^1.4.0-rc.2"
+    "react-icons": "^5.2.1",
+    "react-modern-audio-player": "^1.4.0-rc.2",
+    "react-spinner-material": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
