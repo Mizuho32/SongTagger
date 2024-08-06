@@ -21,7 +21,7 @@ function SongList(props: SongListProps) {
   }, [props.appState.songList]);
 
 
-  const handleUIChange = (idx: number, typeKey: string, value: number|string)  => {
+  const handleUIChange = (idx: number)  => {
     setUIState(prevState => {
       console.log(prevState)
       return prevState.map((elm, idx2) => {
@@ -65,7 +65,7 @@ function SongList(props: SongListProps) {
   }
 
   let [hoveredElement, setHoveredElement] = useState(-1)
-  function onHover(e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, idx: number) {
+  function onHover(_: React.MouseEvent<HTMLTableRowElement, MouseEvent>, idx: number) {
     if (hoveredElement != idx) {
       setHoveredElement(idx)
     }
@@ -90,6 +90,13 @@ function SongList(props: SongListProps) {
     })
   }
 
+  const [endStopper, setEndStopper] = useState({itvHandle: 0})
+  function stopEnd() {
+    //console.log("Clear stop", endStopper)
+    clearInterval(endStopper.itvHandle)
+    endStopper.itvHandle = 0
+    setEndStopper({ itvHandle: 0 })
+  }
   async function timeKeyUp(e: React.KeyboardEvent<HTMLTableDataCellElement>, idx: number, state: Song, type: string) {
     const audioEl = props.appState.audioEl
     if (!audioEl) return
@@ -106,8 +113,28 @@ function SongList(props: SongListProps) {
         })
       })
     } else if (e.key == "s")  { // set cur time to state time
-      audioEl.currentTime = type == "s" ? state.start : state.end
-    } else if (e.key == " ") {
+      let setTime = state.start
+
+      if (type=="e") { // stop if currentTime > state.end
+        setTime = state.end - 4
+        if (endStopper.itvHandle != 0) {
+          stopEnd()
+        }
+        const stopTime = state.end
+        const handle = setInterval(function (){
+          if (audioEl.currentTime > stopTime) {
+            audioEl.pause()
+            stopEnd()
+          }
+
+        }, 500)
+        endStopper.itvHandle = handle
+        setEndStopper({itvHandle: handle})
+        console.log(endStopper)
+      }
+
+      audioEl.currentTime = setTime
+    } else if (e.key == " ") { // pause
       if (audioEl.paused) {
         await audioEl.play()
       } else {
@@ -119,6 +146,13 @@ function SongList(props: SongListProps) {
       } else if (e.key.includes("Right")) {
         audioEl.currentTime += 5
       }
+    }
+  }
+
+  function onBlur() {
+    //console.log("onBlur", endStopper)
+    if (endStopper.itvHandle != 0) {
+      stopEnd()
     }
   }
 
@@ -185,8 +219,8 @@ function SongList(props: SongListProps) {
     return (
       <>
       <div className='songlist controls'>
-        <button type="button" className="songlist control" onMouseUp={e => onDelete()}>Delete</button>
-        <button type="button" className="songlist control" onMouseUp={e => songUtils.uploadSongs(props.appState)}>Submit</button>
+        <button type="button" className="songlist control" onMouseUp={_ => onDelete()}>Delete</button>
+        <button type="button" className="songlist control" onMouseUp={_ => songUtils.uploadSongs(props.appState)}>Submit</button>
       </div>
       <div id="songListContainer">
         <table className="tablecss">
@@ -204,17 +238,17 @@ function SongList(props: SongListProps) {
             {props.appState.songList.map((state: Song, index: number) => (
               <tr key={index} onMouseOver={e=>onHover(e, index)}>
                 <td className="no">
-                  <input type="checkbox" checked={uiState[index]?.checked || false} onChange={_=>handleUIChange(index,"","")}></input>{index}</td>
+                  <input type="checkbox" checked={uiState[index]?.checked || false} onChange={_=>handleUIChange(index)}></input>{index}</td>
                 <td className="start" onFocus={e => onFocus(e, index, state, "s")} onKeyUp={e=>timeKeyUp(e, index, state, "s")}>
                   <Time type="start" time={state.start} time_update={(value: string) => handleTimeChange(index, "start", to_num(value))} isMobile={false}></Time></td>
-                <td className="end" onFocus={e => onFocus(e, index, state, "e")} onKeyUp={e=>timeKeyUp(e, index, state, "e")}>
+                <td className="end" onFocus={e => onFocus(e, index, state, "e")} onKeyUp={e=>timeKeyUp(e, index, state, "e")} onBlur={_=>onBlur()}>
                   <Time type="end" time={state.end} time_update={(value: string) => handleTimeChange(index, "end", to_num(value))} isMobile={false}></Time></td>
                 <td className="length">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}><input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)}></input></td>
                 <td>
                 {
                   hoveredElement == index ?
-                  <button type="button" onMouseUp={e=>addSong(index)} className='songlist add'>+</button> : <div></div>
+                  <button type="button" onMouseUp={_=>addSong(index)} className='songlist add'>+</button> : <div></div>
                 }
                 </td>
               </tr>
