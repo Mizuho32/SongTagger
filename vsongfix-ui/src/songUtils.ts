@@ -96,8 +96,12 @@ export async function fetchStreams(appState: AppState) {
     try {
         const results = await axios.get<Stream[]>(`/api/songlist?artist=${appState.artist}`);
         if (results.status === 200) {
-            console.log("songlist", results.data)
-            appState.setStreamList(results.data);
+            console.log("stream list", results.data)
+            const streams: Stream[] = results.data.map(stream => ({
+                ...stream,
+                lastModified: stream.lastModified ? new Date(stream.lastModified) : undefined
+            }))
+            appState.setStreamList(streams);
         }
     } catch (error) {
         alert(`Error fetching data\n${error}`);

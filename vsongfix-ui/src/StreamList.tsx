@@ -1,4 +1,4 @@
-import { FaLock, FaUnlock, FaRedo, FaEdit } from 'react-icons/fa';
+import { FaLock, FaUnlock, FaRedo, FaEdit, FaPencilAlt } from 'react-icons/fa';
 
 import React, { useEffect, useState } from 'react'
 import {Time, to_time, to_num} from './Time'
@@ -187,6 +187,32 @@ function StreamList(props: StreamListProps) {
       }
     }
   }
+  const date = nameToDate(props.appState.filename)
+
+  function toStatus(stream: Stream, currentDate = "") {
+    let date_str = ""
+    if (stream.lastModified)
+      date_str = `${stream.lastModified?.toLocaleDateString()} ${stream.lastModified?.toLocaleTimeString()}`
+
+    let current = false
+    if (currentDate && stream.name.includes(currentDate)) {
+      current = props.appState.filename.includes(stream.name)
+    }
+
+    if (stream.taggingLock) {
+      return (
+        <>
+          {current ? <FaPencilAlt color="yellow" /> : <FaLock color="yellow" />} {date_str}
+        </>
+      )
+    } else {
+      return (
+        <>
+          <FaUnlock color="green" /> {date_str}
+        </>
+      )
+    }
+  }
 
   if (props.isMobile) {
     return (
@@ -224,8 +250,8 @@ function StreamList(props: StreamListProps) {
             {props.appState.streamList.map((stream: Stream, index: number) => (
               <tr key={index} onMouseOver={e=>onHover(e, index)}>
                 <td className="no">{index}</td>
-                <td className="title" >{nameToDate(stream.name)}</td>
-                <td className="status">{stream.taggingLock ? (<FaLock />) : (<FaUnlock color="green" />)}</td>
+                <td className="title" >{nameToDate(stream.name)} 歌枠</td>
+                <td className="status">{toStatus(stream, date)}</td>
                 <td>
                 {
                   hoveredElement == index || (hoveredElement==-1&&index==0)?
@@ -244,10 +270,12 @@ function StreamList(props: StreamListProps) {
   }
 }
 
+
+
 function nameToDate(name: string) {
   const match = name.match(/^([-0-9]+)_/)
   if (match) {
-    return `${match[1]} 歌枠` || name
+    return match[1] || name
   }
   return name
 }

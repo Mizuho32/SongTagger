@@ -10,6 +10,7 @@ export interface Stream {
     name: string
     extname: string
     taggingLock: boolean
+    lastModified?: Date
 }
 
 type Cookie = {
