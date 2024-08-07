@@ -101,7 +101,7 @@ function SongList(props: SongListProps) {
     const audioEl = props.appState.audioEl
     if (!audioEl) return
 
-    if (e.key == "a") { // apply time
+    if (e.key == "w") { // apply time
       let newState = undefined
       newState = {...state, [type == "s" ? "start" : "end"]: Math.round(audioEl.currentTime)}
       updateSongList((songList) =>{
@@ -134,18 +134,17 @@ function SongList(props: SongListProps) {
       }
 
       audioEl.currentTime = setTime
+      if (audioEl.paused) await audioEl.play()
     } else if (e.key == " ") { // pause
       if (audioEl.paused) {
         await audioEl.play()
       } else {
         await audioEl.pause()
       }
-    } else if (e.key.includes("Arrow")) {
-      if (e.key.includes("Left")) {
-        audioEl.currentTime -= 5
-      } else if (e.key.includes("Right")) {
-        audioEl.currentTime += 5
-      }
+    } else if (e.key == "d") {
+      audioEl.currentTime += 5
+    } else if (e.key == "a") {
+      audioEl.currentTime -= 5
     }
   }
 
@@ -220,7 +219,7 @@ function SongList(props: SongListProps) {
       <>
       <div className='songlist controls'>
         <button type="button" className="songlist control" onMouseUp={_ => onDelete()}>Delete</button>
-        <button type="button" className="songlist control" onMouseUp={_ => songUtils.uploadSongs(props.appState)}>Submit</button>
+        <button type="button" className="songlist control" onMouseUp={_ => songUtils.uploadSongs(props.appState)}>Upload</button>
       </div>
       <div id="songListContainer">
         <table className="tablecss">
