@@ -7,13 +7,13 @@ import StreamList from './StreamList'
 import {Song, Stream, AppState} from './interfaces'
 import {Tab, TabItem} from './Tab'
 import * as songUtils from './songUtils'
-
+import { initSession, lock, unlockWhenClose } from './utils'
 
 import ReactAudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import Spinner from 'react-spinner-material';
 import { useCookies } from "react-cookie";
-import { initSession } from './utils'
+import { isIOS, isMobile, isMobileSafari } from "react-device-detect";
 
 
 function App() {
@@ -38,7 +38,6 @@ function App() {
 
   useEffect(() => {
 
-
     // Get audio
     const tmp = player.current?.audio.current
     if (tmp) {
@@ -61,7 +60,6 @@ function App() {
     } else {
       alert("Failed to init audio")
     }
-
       /*tmp.onprogress = (e: ProgressEvent) => {
         if (isBuffering2) {
           const buffered = tmp.buffered;
@@ -71,8 +69,24 @@ function App() {
           }
         }
       }*/
-
   }, [player]);
+
+  // When appState updated
+  useEffect(() => {
+    if (isMobile) {
+      window.onpagehide = () => {
+        unlockWhenClose(appState)
+      }
+    } else {
+      window.onbeforeunload = async (event) => {
+        console.log("onbeforeunload", appState)
+        await lock(appState.artist, appState.filename, appState.cookies.sessionID, false)
+        //unlockWhenClose(appState)
+        event.preventDefault()
+      }
+
+    }
+  }, [appState])
 
   function toText() {
     return appState.songList.map(song => {

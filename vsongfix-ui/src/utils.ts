@@ -8,7 +8,11 @@ import * as songUtils from './songUtils'
 
 export async function initSession(appState: AppState, artist: string, filename: string|null = "", audioEl: HTMLAudioElement) {
     if (!appState.cookies.sessionID) {
-        appState.setCookie("sessionID", nanoid())
+        const expire = new Date();
+        expire.setMonth(expire.getMonth() + 6);
+        const cookieDate = new Date(expire)
+
+        appState.setCookie("sessionID", nanoid(), { expires: cookieDate, path: '/' })
     }
 
     appState.audioEl = audioEl
@@ -55,6 +59,8 @@ export async function startSession(appState: AppState, artist: string, filename:
 }
 
 export async function lock(artist: string, filename: string, sid: string, get: boolean) {
+    if (!artist || !filename || !sid) return false
+
     let param = `?artist=${artist}&filename=${filename}`
     if (get) {
         param += `&lock=${sid}`
@@ -73,4 +79,41 @@ export async function lock(artist: string, filename: string, sid: string, get: b
     }
 
     return false
+}
+
+export function unlockWhenClose(appState: AppState) {
+
+    const artist = appState.artist
+    const filename = appState.filename
+    const sid = appState.cookies.sessionID
+
+    if (!artist || !filename || !sid) return
+
+    let socket = new WebSocket(`ws://${location.host}/api/websocket`);
+    socket.onopen = function () {
+        socket.send(
+            JSON.stringify({ artist: artist, filename: filename, unlock: sid }))
+    }
+
+    /*let timeout_id = setTimeout(() => {
+        socket.close();
+        alert("アップロードがタイムアウトしました");
+    }, 5 * 1000)
+
+    socket.onmessage = function (event) {
+        clearTimeout(timeout_id);
+
+        let num = parseInt(event.data);
+        if (num == csvData.length) {
+            alert("アップロード完了");
+
+            // unlock
+            //onclose();
+
+        } else {
+            alert(`Error: ${event.data}`);
+        }
+
+        socket.close();
+    }*/
 }
