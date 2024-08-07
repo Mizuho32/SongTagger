@@ -173,15 +173,16 @@ function StreamList(props: StreamListProps) {
   */
 
   async function openSession(text: string, stream: Stream) {
-    if (stream.taggingLock) {
+    /*if (stream.taggingLock) {
       alert(`${text}は作業中です。`)
       return
-    }
+    }*/
 
     const ret = confirm(`${text}を開きます。現在の作業は破棄されます。`)
     if (ret) {
       const filename = stream.name + stream.extname
       const locked = await startSession(props.appState, "", filename)
+      console.log("open Session", props.appState.artist, props.appState.filename)
       if (!locked) {
         alert(`${text}は既に作業中です。`)
       }
