@@ -67,10 +67,12 @@ export function escapeCSVValue(value: string | number): string {
 export async function fetchDetections(appState: AppState, tagged: boolean = false) {
     const artist = appState.artist
     if (!artist) return
+    const filename = appState.filename
+    if (!filename) return
 
     const params = new URLSearchParams()
-    params.set("artist", appState.artist)
-    params.set("filename", appState.filename)
+    params.set("artist", artist)
+    params.set("filename", filename)
 
     if (tagged) {
         params.set("tagged", "1")
