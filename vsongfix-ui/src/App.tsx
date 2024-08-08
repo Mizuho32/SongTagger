@@ -166,7 +166,7 @@ function App() {
 
           </Tab>
         </div>
-        <div id="search"></div>
+        <div id="search"><div></div></div>
       </div>
       <footer>
         <div id="playerContainer">

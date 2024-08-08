@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { FaPlus, FaSearch } from 'react-icons/fa';
+
 import {Time, to_time, to_num} from './Time'
 import './SongList.css'
-
 import {Song, AppState} from './interfaces'
 import * as songUtils from './songUtils'
+import * as utils from './utils'
 
 interface SongListProps {
   appState: AppState
   isMobile?: boolean;
 }
 
-
+type SearchState = {
+  lastTimeout?: number;
+  isComposing?: boolean;
+  lastValue: string;
+};
 
 function SongList(props: SongListProps) {
   // songList の変更を監視するために useEffect を使用
   const [uiState, setUIState] = useState(props.appState.songList.map(_ => ({ checked: false })));
+  const searchState = useRef<SearchState>({lastTimeout: undefined, isComposing: undefined, lastValue: ""});
+
+
   useEffect(() => {
     const tmp = props.appState.songList.map(_ => ({ checked: false }));
     setUIState(tmp);
@@ -48,6 +57,17 @@ function SongList(props: SongListProps) {
       })
       console.log(newState)
       return newState
+    })
+  }
+
+  function setTitle(idx: number, value: string) {
+    props.appState.setSongList(prevState => {
+      return prevState.map((elm, idx2) => {
+        if (idx2 == idx) {
+          return {...elm, ["title"]: value}
+        }
+        return elm
+      })
     })
   }
 
@@ -145,6 +165,14 @@ function SongList(props: SongListProps) {
       audioEl.currentTime += 5
     } else if (e.key == "a") {
       audioEl.currentTime -= 5
+    } else {
+      console.log("other key", e)
+    }
+  }
+
+  async function titleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, idx: number, state: Song) {
+    if (e.ctrlKey && e.key == "Enter") {
+      utils.search(props.appState, state.title)
     }
   }
 
@@ -200,6 +228,43 @@ function SongList(props: SongListProps) {
     }
   }
 
+  function extract_word(e: React.FormEvent<HTMLInputElement>, idx: number) {
+    const state = searchState
+    state.current.isComposing = e.isComposing;
+
+    if (!e.target.value) return;
+
+    if (state.current.lastTimeout) {
+      clearTimeout(state.current.lastTimeout);
+    }
+
+    //console.log(e.target.value, e.isComposing);
+
+    state.current.lastTimeout = setTimeout(() => {
+      if (!state.current.isComposing) { // safe to overwrite value
+        const html = document.querySelector('#search > div')?.innerHTML
+        if (!html) return
+
+        let ext = utils.extractWord(e.target.value, html);
+        console.log("ext", ext, state.current.lastValue)
+
+        // For the case ext is too long (e.g. "坂本真綾の曲")
+        if (state.current.lastValue.includes(e.target.value) && e.target.value.length < state.current.lastValue.length) {
+          state.current.lastValue = e.target.value;
+          return;
+        }
+
+        if (ext.includes(e.target.value)) {
+          //e.target.value = ext;
+          setTitle(idx, ext)
+          state.current.lastValue = ext;
+        }
+      }
+      state.current.lastTimeout = undefined;
+    }, 1000);
+  }
+
+
   if (props.isMobile) {
     return (
       <>
@@ -243,11 +308,15 @@ function SongList(props: SongListProps) {
                 <td className="end" onFocus={e => onFocus(e, index, state, "e")} onKeyUp={e=>timeKeyUp(e, index, state, "e")} onBlur={_=>onBlur()}>
                   <Time type="end" time={state.end} time_update={(value: string) => handleTimeChange(index, "end", to_num(value))} isMobile={false}></Time></td>
                 <td className="length">{showLength(state)}</td>
-                <td className="title" onFocus={e => onFocus(e, index, state, "t")}><input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)}></input></td>
+                <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
+                  <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
+                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, index, state)} onInput={e=>extract_word(e, index)}></input></td>
                 <td>
                 {
                   hoveredElement == index ?
-                  <button type="button" onMouseUp={_=>addSong(index)} className='songlist add'>+</button> : <div></div>
+                  <button type="button" onMouseUp={_=>addSong(index)} className='songlist add'>
+                    <FaPlus />
+                  </button> : <div></div>
                 }
                 </td>
               </tr>

@@ -117,3 +117,50 @@ export function unlockWhenClose(appState: AppState) {
         socket.close();
     }*/
 }
+
+// Search
+export function search(appState:AppState, word: string) {
+  console.log(`search got "${word}"`);
+
+  if (word !== "") {
+    let socket = new WebSocket(`ws://${location.host}/api/websocket`);
+
+    socket.onopen = function(e) {
+      socket.send(JSON.stringify({search: word}));
+    };
+
+    socket.onmessage = function(event) {
+        let div = document.querySelector('#search > div')
+        if (div) {
+            div.innerHTML = event.data;
+            const search_main = div.querySelector("#main")
+            search_main?.setAttribute("id", "search_main")
+
+            div.querySelectorAll("a").forEach(a => {
+                a.removeAttribute("href");
+                a.setAttribute("tabindex", "-1");
+            });
+
+        }
+
+      // if (is_mobile_html()) toggle_info(true);
+      socket.close();
+    };
+
+  }
+}
+
+export function extractWord(word: string, html: string) {
+    if (!word) return word;
+
+    let initial = html.indexOf(word);
+    let subst = html.substring(initial - 50, initial - 1) + html.substring(initial, initial + 50);
+    let nonsymbols = "[^-!$%^&*()_+|~=\`{}\\[\\]:\\\";'<>?,.\\/ 「」]";
+    //console.log({word, initial, subst});
+
+    return subst.match(`(${nonsymbols}*${escapeRegex(word)}${nonsymbols}*)`)?.[1] || "";
+}
+
+function escapeRegex(string: string) {
+      return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}

@@ -13,7 +13,7 @@ button.songlist.control {
   margin: 0.2em;
 }
 
-button.songlist.add {
+button.songlist.add, button.songlist.search {
   padding: 0;
   height: 100%;
   width: 2em;
