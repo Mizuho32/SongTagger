@@ -307,7 +307,7 @@ function SongList(props: SongListProps) {
                   <Time type="start" time={state.start} time_update={(value: string) => handleTimeChange(index, "start", to_num(value))} isMobile={false}></Time></td>
                 <td className="end" onFocus={e => onFocus(e, index, state, "e")} onKeyUp={e=>timeKeyUp(e, index, state, "e")} onBlur={_=>onBlur()}>
                   <Time type="end" time={state.end} time_update={(value: string) => handleTimeChange(index, "end", to_num(value))} isMobile={false}></Time></td>
-                <td className="length">{showLength(state)}</td>
+                <td className="length" align="center">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
                   <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
                   <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, index, state)} onInput={e=>extract_word(e, index)}></input></td>
