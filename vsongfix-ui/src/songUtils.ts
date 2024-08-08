@@ -38,7 +38,8 @@ export function uploadSongs(appState: AppState) {
     socket.onmessage = function (event) {
         clearTimeout(timeout_id);
 
-        let num = parseInt(event.data);
+        const data = JSON.parse(event.data)
+        let num = parseInt(data?.value || -1);
         if (num == csvData.length) {
             alert("アップロード完了");
 
@@ -46,7 +47,7 @@ export function uploadSongs(appState: AppState) {
             //onclose();
 
         } else {
-            alert(`Error: ${event.data}`);
+            alert(`Error: num is ${num}, ${data}`);
         }
 
         socket.close();
