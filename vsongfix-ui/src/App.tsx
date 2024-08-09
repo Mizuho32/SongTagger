@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { FaDownload, FaEdit, FaPollH, FaList } from 'react-icons/fa';
+
 import './App.css'
 import SongList from './SongList'
 import StreamList from './StreamList'
@@ -15,6 +15,12 @@ import Spinner from 'react-spinner-material';
 import { useCookies } from "react-cookie";
 import { isIOS, isMobile, isMobileSafari } from "react-device-detect";
 
+const uiLabels = {
+  "load": isMobile ? (<FaDownload />) : "データ読み込み",
+  "main": isMobile ? (<FaEdit />) : "タグ付け",
+  "output": isMobile ? (<FaPollH />) : "出力",
+  "streams": isMobile ? (<FaList />) : "歌枠リスト",
+}
 
 function App() {
   //const ident = location.search
@@ -25,8 +31,8 @@ function App() {
   const [songList, setSongList] = useState<Song[]>([])
   const [streamList, setStreamList] = useState<Stream[]>([])
   const [audioEl, setAudioEl] = useState<HTMLAudioElement>()
-  const [isBuffering, setBuffering] = useState(false)
   let isBuffering2 = false
+  const [isBuffering, setBuffering] = useState(isBuffering2)
   const [cookies, setCookie, removeCookie] = useCookies();
   const [artist, setArtist] = useState("")
   const [filename, setFilename] = useState("")
@@ -69,6 +75,7 @@ function App() {
           }
         }
       }*/
+
   }, [player]);
 
   // When appState updated
@@ -105,9 +112,14 @@ function App() {
   const [count, setCount] = useState(clickState)
   */
 
-  return (
-    <>
-      {/*
+  /*
+  if (isMobile) {
+    return (<></>)
+  } else {
+   */
+    return (
+      <>
+        {/*
       <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -132,49 +144,51 @@ function App() {
         Click me!
       </button>
       */}
-      
-      <div id="main">
-        {isBuffering && (
-        <div className="spinnerContainer">
-          <Spinner color="#FFFFFF" stroke={10} radius={140} visible={true} />
-        </div>)}
-        <div id="tabs">
-          <Tab defaultKey="mainTab">
 
-            <TabItem tabKey="loadTab" label="データ読み込み">
-              <div className='load controls' >
-                <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(false)}>
-                  Load Detections
-                </button>
-                <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(true)}>
-                  Load Tagged
-                </button>
-              </div>
-            </TabItem>
+        <div id="main">
+          {isBuffering && (
+            <div className="spinnerContainer">
+              <Spinner color="#AAAAAA" stroke={10} radius={140} visible={true} />
+            </div>)}
+          <div id="tabs" className={isMobile ? "mobile" : "desktop"}>
 
-            <TabItem tabKey="mainTab" label="タグ付け">
-              <SongList appState={appState} isMobile={false} />
-            </TabItem>
+            <Tab defaultKey="mainTab">
 
-            <TabItem tabKey="outputTab" label="データ出力">
-              <textarea value={toText()} readOnly={true}></textarea>
-            </TabItem>
+              <TabItem tabKey="loadTab" label={uiLabels.load}>
+                <div className='load controls' >
+                  <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(false)}>
+                    Load Detections
+                  </button>
+                  <button type="button" className="load control" onMouseUp={_ => loadButtonHandler(true)}>
+                    Load Tagged
+                  </button>
+                </div>
+              </TabItem>
 
-            <TabItem tabKey="streamsTab" label="歌枠リスト">
-              <StreamList appState={appState} isMobile={false} />
-            </TabItem>
+              <TabItem tabKey="outputTab" label={uiLabels.output}>
+                <textarea value={toText()} readOnly={true}></textarea>
+              </TabItem>
 
-          </Tab>
+              <TabItem tabKey="mainTab" label={uiLabels.main}>
+                <SongList appState={appState} isMobile={false} />
+              </TabItem>
+
+              <TabItem tabKey="streamsTab" label={uiLabels.streams}>
+                <StreamList appState={appState} isMobile={false} />
+              </TabItem>
+
+            </Tab>
+          </div>
+          <div id="search" className={isMobile ? "mobile" : "desktop"}><div></div></div>
         </div>
-        <div id="search"><div></div></div>
-      </div>
-      <footer>
-        <div id="playerContainer">
-          <ReactAudioPlayer ref={player} />
-        </div>
-      </footer>
-    </>
-  )
+        <footer>
+          <div id="playerContainer">
+            <ReactAudioPlayer ref={player} />
+          </div>
+        </footer>
+      </>
+    )
+  //}
 }
 
 

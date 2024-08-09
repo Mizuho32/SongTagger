@@ -29,6 +29,7 @@ export interface AppState {
     streamList: Stream[]
     audioEl?: HTMLAudioElement
     cookies: Cookie
+    //isMobile: boolean
 
     setSongList: React.Dispatch<React.SetStateAction<Song[]>>
     setStreamList: React.Dispatch<React.SetStateAction<Stream[]>>
@@ -36,6 +37,7 @@ export interface AppState {
     setArtist: React.Dispatch<React.SetStateAction<string>>
     setCookie: (name: string, value: any, options?: any) => void
     removeCookie: (name: string, options?: any) => void
+    //setIsMobile: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export default Song

@@ -22,7 +22,12 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+#tabs.desktop {
   width: 50%;
+}
+#tabs.mobile {
+  width: 100%;
 }
 
 #songListContainer {
@@ -32,8 +37,15 @@ html, body {
   width: 100%;
 }
 
-#search {
+#search.desktop {
   width: 50%;
+  overflow-y: auto;
+}
+#search.mobile {
+  width: 100%;
+  overflow-y: auto;
+  position: fixed;
+  left: 90%;
 }
 
 footer {
@@ -62,9 +74,6 @@ div.spinnerContainer {
   transform: translate(-50%, -50%);
 }
 
-#search {
-  overflow-y: auto;
-}
 
 
 

@@ -1,0 +1,20 @@
+input.mobile {
+   width: 4.2em; 
+}
+
+div.time.change {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+button.time {
+    height: 100%;
+    width:  1.4em;
+    margin: 0;
+    padding: 0;
+}
+
+div.time.mobile {
+    display: flex;
+    flex-direction: row;
+}

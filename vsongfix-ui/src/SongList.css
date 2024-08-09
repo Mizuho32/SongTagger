@@ -29,6 +29,19 @@ button.songlist.add, button.songlist.search {
   flex-direction: column;
 }
 
+div.item.times {
+  display: flex;
+  flex-direction: row;
+}
+div.item.times {
+  display: flex;
+  flex-direction: row;
+}
+div.start, div.end {
+  display: flex;
+  flex-direction: row;
+}
+
 /*
 #root {
   max-width: 1280px;

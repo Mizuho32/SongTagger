@@ -7,13 +7,16 @@ import * as songUtils from './songUtils'
 
 
 export async function initSession(appState: AppState, artist: string, filename: string|null = "", audioEl: HTMLAudioElement) {
-    if (!appState.cookies.sessionID) {
-        const expire = new Date();
-        expire.setMonth(expire.getMonth() + 6);
-        const cookieDate = new Date(expire)
 
-        appState.setCookie("sessionID", nanoid(), { expires: cookieDate, path: '/' })
+    let sessionID: string = appState.cookies.sessionID
+
+    if (!sessionID) {
+        sessionID = nanoid()
     }
+    const expire = new Date();
+    expire.setMonth(expire.getMonth() + 6);
+    const cookieDate = new Date(expire)
+    appState.setCookie("sessionID", sessionID, { expires: cookieDate, path: '/' })
 
     appState.audioEl = audioEl
 
