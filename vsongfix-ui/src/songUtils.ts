@@ -103,7 +103,8 @@ export async function fetchStreams(appState: AppState) {
             const streams: Stream[] = results.data.map(stream => ({
                 ...stream,
                 lastModified: stream.lastModified ? new Date(stream.lastModified) : undefined
-            }))
+            })).reverse()
+
             appState.setStreamList(streams);
         }
     } catch (error) {
