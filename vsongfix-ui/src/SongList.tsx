@@ -165,9 +165,9 @@ function SongList(props: SongListProps) {
       audioEl.currentTime += 5
     } else if (e.key == "a") {
       audioEl.currentTime -= 5
-    } else {
+    } /*else {
       console.log("other key", e)
-    }
+    }*/
   }
 
   async function titleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, idx: number, state: Song) {
