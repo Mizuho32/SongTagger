@@ -1,0 +1,3 @@
+log_requests true
+persistent_timeout 3600
+first_data_timeout 3600

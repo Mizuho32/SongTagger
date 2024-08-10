@@ -1,0 +1,29 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'sinatra-websocket' # install first
+gem 'puma'
+gem 'oga'
+gem 'json'
+gem 'mime-types'
+gem 'sorbet-runtime'
+
+#gem "python-pickle"
+#gem "faye-websocket"
+
+group :develop do
+  gem 'irb'
+  gem 'rdoc'
+  #gem "google-apis-youtube_v3"
+  gem 'test-unit'
+  #gem "faye-websocket"
+  gem 'websocket-client-simple'
+  gem "rake"
+  gem "ffi-rzmq"
+  gem "iruby"
+  gem "sorbet"
+  gem "tapioca"
+end
