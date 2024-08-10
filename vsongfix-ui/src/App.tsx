@@ -84,9 +84,9 @@ function App() {
   // When appState updated
   useEffect(() => {
     if (isMobile) {
-      window.onpagehide = () => {
+      /*window.onpagehide = () => {
         unlockWhenClose(appState)
-      }
+      }*/
     } else {
       window.onbeforeunload = async (event) => {
         console.log("onbeforeunload", appState)
