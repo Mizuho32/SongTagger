@@ -15,7 +15,7 @@ export default defineConfig({
       },
       // WebSocketのプロキシ設定
       '/api/websocket': {
-        target: 'ws://mouse.rimo:8001/websocket',
+        target: 'ws://mouse.rimo:8000/websocket',
         ws: true,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/websocket/, '')
