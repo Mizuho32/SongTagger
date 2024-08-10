@@ -111,17 +111,18 @@ module SongUtils
       adds.each{|start_time, end_time, title, _, track_num|
 
         command = 'ffmpeg'
+        codec = ""
 
         out_path = if filepath.extname.include?("flac") then
           dir_path / ("#{unix_safe_filename(title)}_#{start_time.to_i}" + ".m4a")
         else
-          command += " -c copy"
+          codec = "-c:a copy"
           dir_path / ("#{unix_safe_filename(title)}_#{start_time.to_i}" + filepath.extname)
         end
 
         if not out_path.exist? then
             medatada = "-metadata artist='#{artist}' -metadata album='#{date_str}' -metadata title='#{title}' -metadata track='#{track_num+1}/#{track_size}'"
-            command = "#{command} -i '#{filepath}' -ss #{start_time} -to #{end_time} #{medatada} '#{out_path}'"
+            command = "#{command} -i '#{filepath}' #{codec} -ss #{start_time} -to #{end_time} #{medatada} '#{out_path}'"
 
             puts("ffmpeg: #{title}")
             #puts(command)
