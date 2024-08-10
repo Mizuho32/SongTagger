@@ -218,7 +218,7 @@ class App < Sinatra::Base
           info[:has_detections]
         }.map{|name, info|
           stream = {name: name, extname: info[:extname], taggingLock: !!info[:tagging_lock]}
-          stream[:lastModified] = info[:last_modified] if info.key?(:last_modified)
+          stream[:lastModified] = info[:last_modified].iso8601 if info.key?(:last_modified)
           stream
         }
       json(song_list)
