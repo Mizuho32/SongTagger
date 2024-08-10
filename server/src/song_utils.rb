@@ -129,6 +129,7 @@ module SongUtils
             out, err, status = Open3.capture3(command)
             if !status.exitstatus&.zero? then
                 puts out, err
+                no_erro = false
             end
         end
 
