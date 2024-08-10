@@ -182,14 +182,15 @@ function App() {
 
             </Tab>
           </div>
-          <div id="search" className={isMobile ? "mobile" : "desktop"} style={appState.showSearchResult ? searchMobileCss.show : searchMobileCss.hide}>
-            <button type="button" onClick={_=>appState.setShowSearchResult(true)} className='search show'><FaAngleDoubleLeft /></button>
-            <div id="searchContent">
-            </div>
-            <button type="button" onClick={_=>appState.setShowSearchResult(false)} className='search hide'>
-              <FaAngleDoubleRight /><FaAngleDoubleRight />
-              <FaAngleDoubleRight /><FaAngleDoubleRight />
-            </button>
+          <div id="search" className={isMobile ? "mobile" : "desktop"} style={isMobile ? (appState.showSearchResult ? searchMobileCss.show : searchMobileCss.hide) : {} as React.CSSProperties}>
+            {isMobile && (<>
+              <button type="button" onClick={_ => appState.setShowSearchResult(true)} className='search show'><FaAngleDoubleLeft /></button></>)}
+              <div id="searchContent"></div>
+            {isMobile && (<>
+              <button type="button" onClick={_ => appState.setShowSearchResult(false)} className='search hide'>
+                <FaAngleDoubleRight /><FaAngleDoubleRight />
+                <FaAngleDoubleRight /><FaAngleDoubleRight />
+              </button></>)}
           </div>
         </div>
         <footer>
