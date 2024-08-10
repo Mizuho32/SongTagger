@@ -53,7 +53,7 @@ function StreamList(props: StreamListProps) {
     if (stream.taggingLock) {
       return (
         <>
-          {current ? <FaPencilAlt color="yellow" /> : <FaLock color="yellow" />} {date_str}
+          {current ? <FaPencilAlt color="#ffd636" /> : <FaLock color="#ffd636" />} {date_str}
         </>
       )
     } else {
