@@ -1,5 +1,6 @@
 /public/
 /src/assets/
+/vite.config.ts
 
 # Logs
 logs
