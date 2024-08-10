@@ -41,11 +41,9 @@ html, body {
   width: 50%;
   overflow-y: auto;
 }
-#search.mobile {
+#searchContent {
   width: 100%;
   overflow-y: auto;
-  position: fixed;
-  left: 90%;
 }
 
 footer {
@@ -74,6 +72,17 @@ div.spinnerContainer {
   transform: translate(-50%, -50%);
 }
 
+button.search.show {
+  position: absolute;
+  top: 0px;
+  left:0;
+  transform: translate(-100%,0);
+  padding: 0.5em;
+  height: 20%;
+}
+button.search.hide {
+  height: 4em;
+}
 
 
 

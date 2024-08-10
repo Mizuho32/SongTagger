@@ -4,6 +4,9 @@ table thead {
   left: 0;
   z-index: 1;
 }
+table {
+  border-collapse: collapse;
+}
 
 div.songlist.control {
   position: sticky;
@@ -40,6 +43,10 @@ div.item.times {
 div.start, div.end {
   display: flex;
   flex-direction: row;
+}
+tr {
+  border-color: black;
+  border-width: 3px;
 }
 
 /*

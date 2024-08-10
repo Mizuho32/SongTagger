@@ -18,7 +18,7 @@ type Cookie = {
 }
 
 export interface APIReturn {
-    status: string
+    status: boolean
     value: string
 }
 
@@ -29,6 +29,7 @@ export interface AppState {
     streamList: Stream[]
     audioEl?: HTMLAudioElement
     cookies: Cookie
+    showSearchResult: boolean
     //isMobile: boolean
 
     setSongList: React.Dispatch<React.SetStateAction<Song[]>>
@@ -37,6 +38,7 @@ export interface AppState {
     setArtist: React.Dispatch<React.SetStateAction<string>>
     setCookie: (name: string, value: any, options?: any) => void
     removeCookie: (name: string, options?: any) => void
+    setShowSearchResult: React.Dispatch<React.SetStateAction<boolean>>
     //setIsMobile: React.Dispatch<React.SetStateAction<boolean>>
 }
 

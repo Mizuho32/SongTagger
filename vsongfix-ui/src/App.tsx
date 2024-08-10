@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { FaDownload, FaEdit, FaPollH, FaList } from 'react-icons/fa';
+import React, { useEffect, useState, useRef } from 'react'
+import { FaDownload, FaEdit, FaPollH, FaList, FaAngleDoubleLeft, FaAngleDoubleRight, FaAngleRight } from 'react-icons/fa';
 
 import './App.css'
 import SongList from './SongList'
@@ -14,6 +14,7 @@ import 'react-h5-audio-player/lib/styles.css';
 import Spinner from 'react-spinner-material';
 import { useCookies } from "react-cookie";
 import { isIOS, isMobile, isMobileSafari } from "react-device-detect";
+import { PiDropSimple } from 'react-icons/pi';
 
 const uiLabels = {
   "load": isMobile ? (<FaDownload />) : "データ読み込み",
@@ -36,8 +37,9 @@ function App() {
   const [cookies, setCookie, removeCookie] = useCookies();
   const [artist, setArtist] = useState("")
   const [filename, setFilename] = useState("")
+  const [showSearchResult, setShowSearchResult] = useState(false)
 
-  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl, artist: artist, setArtist: setArtist, filename: filename, setFilename: setFilename, streamList: streamList, setStreamList: setStreamList, cookies: cookies, setCookie: setCookie, removeCookie: removeCookie}
+  const appState: AppState = {songList: songList, setSongList: setSongList, audioEl: audioEl, artist: artist, setArtist: setArtist, filename: filename, setFilename: setFilename, streamList: streamList, setStreamList: setStreamList, cookies: cookies, setCookie: setCookie, removeCookie: removeCookie, showSearchResult: showSearchResult, setShowSearchResult: setShowSearchResult}
 
   const player = useRef<ReactAudioPlayer>(null)
 
@@ -49,6 +51,7 @@ function App() {
     if (tmp) {
 
       const ident = initSession(appState, artistParam, urlParams.get("filename"), tmp)
+      //alert(appState.cookies.sessionID)
       ident.then(_ => {
         setAudioEl(tmp)
 
@@ -179,7 +182,15 @@ function App() {
 
             </Tab>
           </div>
-          <div id="search" className={isMobile ? "mobile" : "desktop"}><div></div></div>
+          <div id="search" className={isMobile ? "mobile" : "desktop"} style={appState.showSearchResult ? searchMobileCss.show : searchMobileCss.hide}>
+            <button type="button" onClick={_=>appState.setShowSearchResult(true)} className='search show'><FaAngleDoubleLeft /></button>
+            <div id="searchContent">
+            </div>
+            <button type="button" onClick={_=>appState.setShowSearchResult(false)} className='search hide'>
+              <FaAngleDoubleRight /><FaAngleDoubleRight />
+              <FaAngleDoubleRight /><FaAngleDoubleRight />
+            </button>
+          </div>
         </div>
         <footer>
           <div id="playerContainer">
@@ -191,6 +202,28 @@ function App() {
   //}
 }
 
+const commonCSS: React.CSSProperties = {
+  "width": "100%",
+  "height": "100%",
+  /*"overflowY": "auto",
+  "overflowX": "visible",*/
+  "position": "fixed",
+  "backgroundColor": "white",
+  "zIndex": 4,
+  "display": "flex",
+  "flexDirection": "column",
+  "justifyContent": "space-between"
+}
 
+const searchMobileCss = {
+  "hide": ({
+    ...commonCSS,
+    "left": "100%",
+  } as React.CSSProperties),
+  "show": ({
+    ...commonCSS,
+    "left": "0%",
+  } as React.CSSProperties),
+}
 
 export default App

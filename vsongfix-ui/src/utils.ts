@@ -1,3 +1,4 @@
+import { isMobile } from "react-device-detect";
 import axios from "axios"
 import { nanoid } from "nanoid";
 
@@ -61,6 +62,32 @@ export async function startSession(appState: AppState, artist: string, filename:
     return ret
 }
 
+export async function endSession(appState: AppState) {
+    const filename = appState.filename
+
+    if (filename) {
+        let released = false
+        // release lock
+        released = await lock(appState.artist, appState.filename, appState.cookies.sessionID, false)
+        
+        if (released) {
+            alert("ロック解除しました")
+        } else {
+            alert("ロック解除失敗。既に解除されている?")
+        }
+    }
+
+    await songUtils.fetchStreams(appState)
+    if (appState.audioEl) {
+        appState.audioEl.src = ""
+    }
+
+    appState.filename = ""
+    appState.setFilename("")
+    appState.songList = []
+    appState.setSongList([])
+}
+
 export async function lock(artist: string, filename: string, sid: string, get: boolean) {
     if (!artist || !filename || !sid) return false
 
@@ -75,6 +102,7 @@ export async function lock(artist: string, filename: string, sid: string, get: b
         const results = await axios.get<APIReturn>(`/api/lock${param}`);
         if (results.status === 200) {
             console.log(get ? "lock" : "unlock", results.data)
+            console.log("lock get", results.data)
             return results.data.status
         }
     } catch (error) {
@@ -133,7 +161,7 @@ export function search(appState:AppState, word: string) {
     };
 
     socket.onmessage = function(event) {
-        let div = document.querySelector('#search > div')
+        let div = document.querySelector('#searchContent')
         if (div) {
             div.innerHTML = event.data;
             const search_main = div.querySelector("#main")
@@ -144,6 +172,15 @@ export function search(appState:AppState, word: string) {
                 a.setAttribute("tabindex", "-1");
             });
 
+        }
+
+        if (isMobile) {
+            appState.setShowSearchResult(true)
+            // const divSearch: HTMLDivElement|undefined = document.querySelector("#search.mobile") as HTMLDivElement
+            // console.log("Toggle", divSearch)
+            // if (divSearch) {
+                // divSearch.style.left = ""
+            // }
         }
 
       // if (is_mobile_html()) toggle_info(true);

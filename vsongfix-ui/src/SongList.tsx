@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { FaPlus, FaSearch, FaTrashAlt, FaCloudUploadAlt, FaStepBackward, FaStepForward, FaAppStore} from 'react-icons/fa';
+import { FaPlus, FaSearch, FaTrashAlt, FaCloudUploadAlt, FaStepBackward, FaStepForward, FaAppStore, FaUnlockAlt} from 'react-icons/fa';
 import { isMobile } from "react-device-detect";
 
 import {Time, to_time, to_num} from './Time'
@@ -22,6 +22,7 @@ type SearchState = {
 const uiLabels = {
   "delete": isMobile ? (<FaTrashAlt />) : "削除",
   "upload": isMobile ? (<FaCloudUploadAlt />) : "Upload",
+  "unlock": isMobile ? (<FaUnlockAlt />) : "UnLock",
 }
 
 function SongList(props: SongListProps) {
@@ -285,6 +286,11 @@ function SongList(props: SongListProps) {
       <button type="button" className="songlist control" onMouseUp={_ => songUtils.uploadSongs(props.appState)}>
         {uiLabels.upload} 
       </button>
+      {isMobile && (
+        <button type="button" className="songlist control" onMouseUp={_ => utils.endSession(props.appState)}>
+          {uiLabels.unlock} 
+        </button>
+      )}
     </div>
   )
   if (isMobile) {
@@ -292,7 +298,7 @@ function SongList(props: SongListProps) {
       <>
       { songlistControls }
       <div id="songListContainer">
-        <table className="tablecss">
+        <table className="tablecss" border={1}>
           <thead>
             <tr>
               <th className="no">No.</th>
@@ -306,6 +312,17 @@ function SongList(props: SongListProps) {
                     <input type="checkbox" checked={uiState[index]?.checked || false} onChange={_ => handleUIChange(index)}></input>{index}</td>
 
                   <td className='item'>
+
+                    <div className="item inputs">
+                      <div className="title" onFocus={e => onFocus(e, index, state, "t")}>
+                        <button type="button" onMouseUp={_ => utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
+                        <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e => titleKeyUp(e, index, state)} onInput={e => extract_word(e, index)}></input>
+                        <button type="button" onMouseUp={_ => addSong(index)} className='songlist add'>
+                          <FaPlus />
+                        </button>
+                      </div>
+                    </div>
+
                     <div className='item times'>
                       <div className="start" onFocus={e => onFocus(e, index, state, "s")} onKeyUp={e => timeKeyUp(e, index, state, "s")}>
                         <Time type="start" time={state.start} time_update={(value: string|number) => handleTimeChange(index, "start", to_num(value))} audioEl={props.appState.audioEl}></Time>
@@ -321,15 +338,7 @@ function SongList(props: SongListProps) {
                         <Time type="end" time={state.end} time_update={(value: string|number) => handleTimeChange(index, "end", to_num(value))} audioEl={props.appState.audioEl}></Time>
                       </div>
                     </div>
-                    <div className="item inputs">
-                      <div className="title" onFocus={e => onFocus(e, index, state, "t")}>
-                        <button type="button" onMouseUp={_ => utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
-                        <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e => titleKeyUp(e, index, state)} onInput={e => extract_word(e, index)}></input>
-                        <button type="button" onMouseUp={_ => addSong(index)} className='songlist add'>
-                          <FaPlus />
-                        </button>
-                      </div>
-                    </div>
+                    
                   </td>
                 </tr>
             ))}
@@ -360,9 +369,9 @@ function SongList(props: SongListProps) {
                 <td className="no">
                   <input type="checkbox" checked={uiState[index]?.checked || false} onChange={_=>handleUIChange(index)}></input>{index}</td>
                 <td className="start" onFocus={e => onFocus(e, index, state, "s")} onKeyUp={e=>timeKeyUp(e, index, state, "s")}>
-                  <Time type="start" time={state.start} time_update={(value: string|number) => handleTimeChange(index, "start", to_num(value))} isMobile={false}></Time></td>
+                  <Time type="start" time={state.start} time_update={(value: string|number) => handleTimeChange(index, "start", to_num(value))} ></Time></td>
                 <td className="end" onFocus={e => onFocus(e, index, state, "e")} onKeyUp={e=>timeKeyUp(e, index, state, "e")} onBlur={_=>onBlur()}>
-                  <Time type="end" time={state.end} time_update={(value: string|number) => handleTimeChange(index, "end", to_num(value))} isMobile={false}></Time></td>
+                  <Time type="end" time={state.end} time_update={(value: string|number) => handleTimeChange(index, "end", to_num(value))} ></Time></td>
                 <td className="length" align="center">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
                   <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
