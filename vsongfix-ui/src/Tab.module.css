@@ -27,7 +27,7 @@
 
 .active {
   color: var(--background-blue);
-  background-color: var(--background-white);
+  background-color: #8bdffd; /*var(--background-white);*/
   border-bottom: 3px solid var(--background-blue);
 }
 
