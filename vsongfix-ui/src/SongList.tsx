@@ -287,7 +287,12 @@ function SongList(props: SongListProps) {
         {uiLabels.upload} 
       </button>
       {isMobile && (
-        <button type="button" className="songlist control" onMouseUp={_ => utils.endSession(props.appState)}>
+        <button type="button" className="songlist control" onMouseUp={_ => {
+          const ok = confirm("アンロックします。作業内容は失われます")
+          if (ok) {
+            utils.endSession(props.appState)
+          }
+        }}>
           {uiLabels.unlock} 
         </button>
       )}
