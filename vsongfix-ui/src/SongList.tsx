@@ -241,11 +241,16 @@ function SongList(props: SongListProps) {
     }
   }
 
-  function extract_word(e: React.FormEvent<HTMLInputElement>, idx: number) {
-    const state = searchState
-    state.current.isComposing = e.isComposing;
+  function cmpChange(start: boolean){
+    searchState.current.isComposing = start
+  }
 
-    if (!e.target.value) return;
+  function extract_word(e: React.FormEvent<HTMLInputElement>, idx: number) {
+    if (!('value' in e.target)) return
+    const e_target_value = e.target.value as string
+    if (!e_target_value) return;
+
+    const state = searchState
 
     if (state.current.lastTimeout) {
       clearTimeout(state.current.lastTimeout);
@@ -255,19 +260,20 @@ function SongList(props: SongListProps) {
 
     state.current.lastTimeout = setTimeout(() => {
       if (!state.current.isComposing) { // safe to overwrite value
+
         const html = document.querySelector('#search > div')?.innerHTML
         if (!html) return
 
-        let ext = utils.extractWord(e.target.value, html);
+        let ext = utils.extractWord(e_target_value, html);
         console.log("ext", ext, state.current.lastValue)
 
         // For the case ext is too long (e.g. "坂本真綾の曲")
-        if (state.current.lastValue.includes(e.target.value) && e.target.value.length < state.current.lastValue.length) {
-          state.current.lastValue = e.target.value;
+        if (state.current.lastValue.includes(e_target_value) && e_target_value.length < state.current.lastValue.length) {
+          state.current.lastValue = e_target_value;
           return;
         }
 
-        if (ext.includes(e.target.value)) {
+        if (ext.includes(e_target_value)) {
           //e.target.value = ext;
           setTitle(idx, ext)
           state.current.lastValue = ext;
@@ -380,7 +386,7 @@ function SongList(props: SongListProps) {
                 <td className="length" align="center">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
                   <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
-                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, state)} onInput={e=>extract_word(e, index)}></input></td>
+                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, state)} onInput={e=>extract_word(e, index)} onCompositionStart={_=>cmpChange(true)} onCompositionEnd={_=>cmpChange(false)}></input></td>
                 <td>
                 {
                   hoveredElement == index ?
