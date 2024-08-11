@@ -1,7 +1,6 @@
 import { FaLock, FaUnlock, FaRedo, FaEdit, FaPencilAlt } from 'react-icons/fa';
 
-import React, { useEffect, useState } from 'react'
-import {Time, to_time, to_num} from './Time'
+import React, { useState } from 'react'
 import './StreamList.css'
 
 import {Stream, AppState} from './interfaces'
@@ -16,7 +15,7 @@ interface StreamListProps {
 function StreamList(props: StreamListProps) {
 
   let [hoveredElement, setHoveredElement] = useState(-1)
-  function onHover(e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, idx: number) {
+  function onHover(_: React.MouseEvent<HTMLTableRowElement, MouseEvent>, idx: number) {
     if (hoveredElement != idx) {
       setHoveredElement(idx)
     }

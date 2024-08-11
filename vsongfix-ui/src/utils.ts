@@ -2,8 +2,7 @@ import { isMobile } from "react-device-detect";
 import axios from "axios"
 import { nanoid } from "nanoid";
 
-import { APIReturn, AppState, Stream } from "./interfaces";
-import {Song} from "./interfaces"
+import { APIReturn, AppState } from "./interfaces";
 import * as songUtils from './songUtils'
 
 
@@ -156,7 +155,7 @@ export function search(appState:AppState, word: string) {
   if (word !== "") {
     let socket = new WebSocket(`ws://${location.host}/api/websocket`);
 
-    socket.onopen = function(e) {
+    socket.onopen = function() {
       socket.send(JSON.stringify({search: word}));
     };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { FaDownload, FaEdit, FaPollH, FaList, FaAngleDoubleLeft, FaAngleDoubleRight, FaAngleRight } from 'react-icons/fa';
+import { FaDownload, FaEdit, FaPollH, FaList, FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 import './App.css'
 import SongList from './SongList'
@@ -7,14 +7,13 @@ import StreamList from './StreamList'
 import {Song, Stream, AppState} from './interfaces'
 import {Tab, TabItem} from './Tab'
 import * as songUtils from './songUtils'
-import { initSession, lock, unlockWhenClose } from './utils'
+import { initSession, lock } from './utils'
 
 import ReactAudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import Spinner from 'react-spinner-material';
 import { useCookies } from "react-cookie";
-import { isIOS, isMobile, isMobileSafari } from "react-device-detect";
-import { PiDropSimple } from 'react-icons/pi';
+import { isMobile } from "react-device-detect";
 
 const uiLabels = {
   "load": isMobile ? (<FaDownload />) : "データ読み込み",

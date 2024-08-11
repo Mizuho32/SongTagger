@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { FaPlus, FaSearch, FaTrashAlt, FaCloudUploadAlt, FaStepBackward, FaStepForward, FaAppStore, FaUnlockAlt} from 'react-icons/fa';
+import { FaPlus, FaSearch, FaTrashAlt, FaCloudUploadAlt, FaStepBackward, FaStepForward, FaUnlockAlt} from 'react-icons/fa';
 import { isMobile } from "react-device-detect";
 
 import {Time, to_time, to_num} from './Time'
@@ -183,7 +183,7 @@ function SongList(props: SongListProps) {
     }*/
   }
 
-  async function titleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, idx: number, state: Song) {
+  async function titleKeyUp(e: React.KeyboardEvent<HTMLInputElement>, state: Song) {
     if (e.ctrlKey && e.key == "Enter") {
       utils.search(props.appState, state.title)
     }
@@ -321,7 +321,7 @@ function SongList(props: SongListProps) {
                     <div className="item inputs">
                       <div className="title" onFocus={e => onFocus(e, index, state, "t")}>
                         <button type="button" onMouseUp={_ => utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
-                        <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e => titleKeyUp(e, index, state)} onInput={e => extract_word(e, index)}></input>
+                        <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e => titleKeyUp(e, state)} onInput={e => extract_word(e, index)}></input>
                         <button type="button" onMouseUp={_ => addSong(index)} className='songlist add'>
                           <FaPlus />
                         </button>
@@ -380,7 +380,7 @@ function SongList(props: SongListProps) {
                 <td className="length" align="center">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
                   <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
-                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, index, state)} onInput={e=>extract_word(e, index)}></input></td>
+                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, state)} onInput={e=>extract_word(e, index)}></input></td>
                 <td>
                 {
                   hoveredElement == index ?
