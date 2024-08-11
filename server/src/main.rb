@@ -142,7 +142,6 @@ class App < Sinatra::Base
     end
   end
 
-
   get '/detections' do
     artist = App.get_artist(params["artist"])
     halt 404 if artist.empty?
@@ -224,7 +223,6 @@ class App < Sinatra::Base
     end
   end
 
-
   get '/list_renew' do
     App.list = Utils.renew_list(App.option[:det_root], App.list)
     Utils.save_list(App.list)
@@ -264,29 +262,24 @@ class App < Sinatra::Base
   end
 
   get '/' do
-    is_mobile = params.key?("mobile")
-    video_id, segments = Utils.load_segments(params["video_id"].to_s)
-
-    video_info = App.list[video_id.to_sym]
-    if video_info then
-      tagging_lock = video_info[:tagging_lock]
-      unlock = (not params["lock"].nil? and params["lock"] == tagging_lock)
-      #p params["lock"], tagging_lock
-      return erb(:now_tagging, locals: video_info) if tagging_lock.is_a?(String) and not unlock # locked
-    end
-
-    locals = {
-      :css =>  is_mobile ? "mobile.css" : "style.css",
-      is_mobile: is_mobile, raw_times: segments, video_id: video_id
-    }
-
-    erb :index, locals: {
-      **locals,
-      search: erb(:search, locals: locals),
-      table: erb(:table, locals: locals)
-    }
+    send_file File.join(settings.public_folder, 'index.html')
   end
 
+  get '/api/:api_name' do
+    api_name = params[:api_name]
+    current_port = settings.port
+    query_string = request.query_string
+    uri = URI.parse("http://localhost:#{current_port}/#{api_name}?#{query_string}")
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.request_uri)
+
+    response = http.request(request)
+    status response.code
+    body response.body
+  end
+
+## OLD
   get '/tagging' do
     Utils.renew_list(App.list) # FIXME: should not access disk
     erb :manual_list, locals: {
@@ -397,6 +390,7 @@ class App < Sinatra::Base
     puts err
     err
   end
+##
 
   get '/websocket' do
     if request.websocket?
@@ -425,12 +419,12 @@ class App < Sinatra::Base
             puts ("lock #{query}")
             status, value = Utils.lock(App, **query)
             ws.send({statu: status, value: value}.to_json);
-             
+
           elsif query.key? :unlock then
             puts ("unlock #{query}")
             status, value = Utils.unlock(App, **query)
             ws.send({statu: status, value: value}.to_json);
-            
+
           end
         rescue StandardError => ex
           puts ex.message, Utils.remove_bundler(ex).join("\n")
