@@ -43,6 +43,7 @@ export function uploadSongs(appState: AppState) {
         if (num == csvData.length) {
             alert("アップロード完了");
 
+            fetchStreams(appState)
             // unlock
             //onclose();
 
