@@ -16,8 +16,16 @@ module Utils
   LIST_FILE = Pathname("list.yaml")
   MEDIA_FILES = %w[mp3 wav flac aac ogg m4a]
 
-  def init(det_dir)
-    exit(1) if !det_dir.exist? || !det_dir.directory?
+  def init(option)
+    det_dir = option[:det_root]
+    id_map_file = option[:id_map]
+
+    if !det_dir.exist? || !det_dir.directory? then
+      $stderr.puts("No detections dir #{det_dir}")
+      exit(1)
+    elsif id_map_file.exist? then
+      option[:id_map] = YAML.load_file(option[:id_map])
+    end
   end
 
   # https://qiita.com/TeQuiLayy/items/a74f928426dcb013e1cd
@@ -41,6 +49,19 @@ module Utils
           .encode("UTF-8"))
     return parsed.xpath("//div[@id='main']").first.to_xml
 
+  end
+
+  def search(word, debug=false)
+    if debug then
+      puts "search: #{word}"
+      #sleep 1
+      html = Oga.parse_html(File.read("public/test2.html").encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?').encode("UTF-8"))
+      main = html.xpath("//div[@id='main']").first
+
+      return main.to_xml
+    else
+      return google(word)
+    end
   end
 
   def load_tags(csv_path)

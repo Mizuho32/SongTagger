@@ -25,7 +25,7 @@ module SongUtils
     return -diff
   end
 
-  def extract_songs(artist, input_tags, filepath, cache_dir, same_time_thres: 0.5)
+  def extract_songs(artist, tag_artist, input_tags, filepath, cache_dir, same_time_thres: 0.5)
     parsed_date = DateTime.parse(filepath.basename.to_s)
     date_str = parsed_date.strftime('%Y-%m-%d')
     dir_path = cache_dir / artist / date_str
@@ -97,7 +97,7 @@ module SongUtils
 
 
     Thread.new {
-    no_erro = true
+    no_erro = T.let(true, T::Boolean)
     begin
       deletes.each{|start_time, _, title, _|
         title = unix_safe_filename(title)
@@ -121,7 +121,7 @@ module SongUtils
         end
 
         if not out_path.exist? then
-            medatada = "-metadata artist='#{artist}' -metadata album='#{date_str}' -metadata title='#{title}' -metadata track='#{track_num+1}/#{track_size}'"
+            medatada = "-metadata artist='#{tag_artist}' -metadata album='#{date_str}' -metadata title='#{title}' -metadata track='#{track_num+1}/#{track_size}'"
             command = "#{command} -i '#{filepath}' #{codec} -ss #{start_time} -to #{end_time} #{medatada} '#{out_path}'"
 
             puts("ffmpeg: #{title}")

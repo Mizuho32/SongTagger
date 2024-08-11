@@ -13,6 +13,7 @@ parser = OptionParser.new
 parser.on("--det-dir detection dir root", "root dir of detection dirs") {|v| option[:det_root] = Pathname(v) }
 parser.on("--cache-dir cache dir root", "Navidrome media file cache dir root") {|v| option[:cache_root] = Pathname(v) }
 parser.on("--tagging-cache-dir taggin cache dir root", "Media file cache for tagging root dir") {|v| option[:tagging_cache_root] = Pathname(v) }
+parser.on("--id-map id_map.yaml", "id map config") {|v| option[:id_map] = Pathname(v) }
 parser.on('-d', "--debug", "Debug mode") { option[:debug] = true }
 parser.on('-s google sheet id and gid', "--sheet-link", "id and gid of Google sheet for commenting") {|v| option[:sheet_link] = v }
 parser.on('--lc list.yaml', "--list-with-comments", "List with video comments") {|v| option[:list_with_comments] = v }
@@ -36,7 +37,7 @@ parser.parse!(ARGV)
 require_relative 'src/utils'
 require_relative 'src/main'
 
-Utils.init(option[:det_root])
+Utils.init(option)
 
 catch(:end) do
   loop do

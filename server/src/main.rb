@@ -74,21 +74,35 @@ class App < Sinatra::Base
   end
 
   class << self
-    attr_reader :option, :args, :mutex
+    attr_reader :option, :args, :mutex, :id_map
     attr_accessor :restart, :list
     def run!(opt, **args)
       @option = opt
       @args   = args
       @list   = Utils.load_list(@option[:det_root])
       #pp @list
+      @id_map = opt[:id_map]
       @restart = false
       @mutex = Thread::Mutex.new()
       super(**args)
     end
+
+    def get_artist(id)
+      return @id_map[id.to_sym]&.[](:system_name).to_s if id
+      ""
+    end
+
+    def get_tag_artist(id)
+      return @id_map[id.to_sym]&.[](:tag_name).to_s if id
+      ""
+    end
   end
 
   get '/audio' do
-    file_path = App.option[:det_root] / params["artist"] / params["filename"]
+    artist = App.get_artist(params["artist"])
+    halt 404 if artist.empty?
+
+    file_path = App.option[:det_root] / artist / params["filename"]
     halt 404 unless file_path.exist?
 
     m4a_file_path = App.option[:tagging_cache_root] / params["artist"] / "#{file_path.basename(file_path.extname)}.m4a"
@@ -130,10 +144,13 @@ class App < Sinatra::Base
 
 
   get '/detections' do
+    artist = App.get_artist(params["artist"])
+    halt 404 if artist.empty?
+
     filename = Pathname(params["filename"])
     name = filename.basename(filename.extname)
     csv_file_name = if params.key?("tagged") then "tags.csv" else "#{name}.csv" end
-    dir = App.option[:det_root] / params["artist"] / "identified" / name
+    dir = App.option[:det_root] / artist / "identified" / name
 
     file_path =  dir / csv_file_name
     file_path = dir / "#{name}" if !file_path.exist?
@@ -154,7 +171,10 @@ class App < Sinatra::Base
   end
 
   get '/extract' do
-    artist = params["artist"]
+    artist = App.get_artist(params["artist"])
+    halt 404 if artist.empty?
+    tag_artist = App.get_tag_artist(params["artist"])
+
     file_path = App.option[:det_root] / artist / params["filename"]
     cache_dir = App.option[:cache_root]
 
@@ -165,13 +185,17 @@ class App < Sinatra::Base
       status 404
       body "No tag"
     else
-      SongUtils.extract_songs(artist, Utils.load_tags(tags_csv), file_path, cache_dir)
+      SongUtils.extract_songs(artist, tag_artist, Utils.load_tags(tags_csv), file_path, cache_dir)
       body "processing..."
     end
   end
 
   get '/extracts' do
-    artist = params["artist"]
+    artist = App.get_artist(params["artist"])
+    halt 404 if artist.empty?
+    tag_artist = App.get_tag_artist(params["artist"])
+
+
     artist_exists = App.option[:det_root] / artist
 
     if artist_exists.directory? then
@@ -186,7 +210,7 @@ class App < Sinatra::Base
         tags_csv = App.option[:det_root] / artist / "identified" / filestemname.to_s / "tags.csv"
         if tags_csv.exist? then
             #puts(artist, tags_csv, file_path, cache_dir)
-            SongUtils.extract_songs(artist, Utils.load_tags(tags_csv), file_path, cache_dir)
+            SongUtils.extract_songs(artist, tag_artist, Utils.load_tags(tags_csv), file_path, cache_dir)
         end
       }
       rescue StandardError => ex
@@ -209,7 +233,9 @@ class App < Sinatra::Base
   end
 
   get "/songlist" do
-    artist = params["artist"].to_sym
+    artist = App.get_artist(params["artist"]).to_sym
+    halt 404 if artist.empty?
+
     if !App.list.key?(artist) then
       json([])
     else
@@ -227,6 +253,8 @@ class App < Sinatra::Base
 
   get '/lock' do
     query = params.map{|k,v| [k.to_sym, v]}.to_h
+    query[:artist] = App.get_artist(query[:artist])
+
     status, value = if query.key?(:lock) then
       Utils.lock(App, **query)
     else
@@ -381,20 +409,13 @@ class App < Sinatra::Base
 
         ws.onmessage do |msg|
           query = JSON.parse(msg, symbolize_names: true)
+          query[:artist] = App.get_artist(query[:artist])
           puts "WS: #{query}"
 
           if query.key? :search then
             word = query[:search].to_s
-            if App.option[:debug] then
-              puts "search: #{word}"
-              #sleep 1
-              html = Oga.parse_html(File.read("public/test2.html").encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?').encode("UTF-8"))
-              main = html.xpath("//div[@id='main']").first
-
-              ws.send(main.to_xml)
-            else
-              ws.send(Utils.google(word))
-            end
+            ret = Utils.search(word, App.option[:debug])
+            ws.send(ret)
           elsif query.key? :tags then
             ret = Utils.upload_tags(App, **query)
             ws.send({status: true, value: ret}.to_json)
