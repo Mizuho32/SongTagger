@@ -26,4 +26,5 @@ group :develop do
   gem "iruby"
   gem "sorbet"
   gem "tapioca"
+  gem "nanoid"
 end

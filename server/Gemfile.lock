@@ -49,6 +49,7 @@ GEM
     multi_json (1.15.0)
     mustermann (3.0.1)
       ruby2_keywords (~> 0.0.1)
+    nanoid (2.0.0)
     native-package-installer (1.1.9)
     netrc (0.11.0)
     nio4r (2.7.3)
@@ -154,6 +155,7 @@ DEPENDENCIES
   iruby
   json
   mime-types
+  nanoid
   oga
   puma
   rake
