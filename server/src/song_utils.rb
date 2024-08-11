@@ -122,10 +122,13 @@ module SongUtils
 
         if not out_path.exist? then
             medatada = "-metadata artist='#{tag_artist}' -metadata album='#{date_str}' -metadata title='#{title}' -metadata track='#{track_num+1}/#{track_size}'"
-            command = "#{command} -i '#{filepath}' #{codec} -ss #{start_time} -to #{end_time} #{medatada} '#{out_path}'"
+            filter = ""#%Q|-filter_complex "aevalsrc=0:d=3[silence];[0][silence]concat=n=2:v=0:a=1"|
+            # aevalsrc=0:d=3[silence]: 3秒間の無音オーディオを生成します。
+            # [0][silence]concat=n=2:v=0:a=1: 元のオーディオと生成した無音オーディオを連結します。
+            command = "#{command} -i '#{filepath}' #{codec} -ss #{start_time} -to #{end_time} #{medatada} #{filter} '#{out_path}'"
 
             puts("ffmpeg: #{title}")
-            #puts(command)
+            puts(command)
             #next
             out, err, status = Open3.capture3(command)
             if !status.exitstatus&.zero? then
