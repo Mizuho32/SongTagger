@@ -4,8 +4,14 @@ table thead {
   left: 0;
   z-index: 1;
 }
-table {
+table.songlist {
   border-collapse: collapse;
+  width: 100%;
+  table-layout:auto;
+}
+tr.songlist {
+  /*display: flex;
+  width: 100%;*/
 }
 
 div.songlist.control {
@@ -20,6 +26,22 @@ button.songlist.add, button.songlist.search {
   padding: 0;
   height: 100%;
   width: 2em;
+}
+td.title {
+  display: flex;
+}
+td.no {
+  padding-right: 0.5em;
+}
+td.no, td.start, td.end, td.length {
+  width: 1%;
+  white-space: nowrap;
+}
+button.songlist.search {
+  flex-shrink: 0;
+}
+input.songlist.title {
+  flex-grow: 1;
 }
 
 #tabs > ul {

@@ -363,7 +363,7 @@ function SongList(props: SongListProps) {
       <>
       { songlistControls }
       <div id="songListContainer">
-        <table className="tablecss">
+        <table className="songlist">
           <thead>
             <tr>
               <th className="no">No.</th>
@@ -376,7 +376,7 @@ function SongList(props: SongListProps) {
           </thead>
           <tbody id="stamps">
             {props.appState.songList.map((state: Song, index: number) => (
-              <tr key={index} onMouseOver={e=>onHover(e, index)}>
+              <tr key={index} className="songlist" onMouseOver={e=>onHover(e, index)}>
                 <td className="no">
                   <input type="checkbox" checked={uiState[index]?.checked || false} onChange={_=>handleUIChange(index)}></input>{index}</td>
                 <td className="start" onFocus={e => onFocus(e, index, state, "s")} onKeyUp={e=>timeKeyUp(e, index, state, "s")}>
@@ -386,7 +386,7 @@ function SongList(props: SongListProps) {
                 <td className="length" align="center">{showLength(state)}</td>
                 <td className="title" onFocus={e => onFocus(e, index, state, "t")}>
                   <button type="button" onMouseUp={_=>utils.search(props.appState, state.title)} className='songlist search'><FaSearch /></button>
-                  <input type="text" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, state)} onInput={e=>extract_word(e, index)} onCompositionStart={_=>cmpChange(true)} onCompositionEnd={_=>cmpChange(false)}></input></td>
+                  <input type="text" className="songlist title" value={state.title} onChange={e => handleTimeChange(index, "title", e.target.value)} onKeyUp={e=>titleKeyUp(e, state)} onInput={e=>extract_word(e, index)} onCompositionStart={_=>cmpChange(true)} onCompositionEnd={_=>cmpChange(false)}></input></td>
                 <td>
                 {
                   hoveredElement == index ?
