@@ -5,6 +5,7 @@ require 'json'
 require 'csv'
 require 'date'
 require 'mime/types'
+require 'net/http'
 
 #require 'sinatra/reloader' if development?
 require 'oga'
