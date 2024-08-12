@@ -57,7 +57,7 @@ export async function startSession(appState: AppState, artist: string, filename:
     }
 
     await songUtils.fetchStreams(appState)
-    if (param && appState.audioEl) appState.audioEl.src = `/api/audio${param}`
+    if (param && appState.audioEl) appState.audioEl.src = `/audio${param}`
     return ret
 }
 
