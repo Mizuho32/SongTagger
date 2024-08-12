@@ -148,7 +148,11 @@ module Utils
 
   def load_list(det_root)
     list = {}
-    list = YAML.unsafe_load_file(LIST_FILE) if LIST_FILE.exist?
+    if defined?(YAML.unsafe_load_file) then
+      list = YAML.unsafe_load_file(LIST_FILE) if LIST_FILE.exist?
+    else
+      list = YAML.load_file(LIST_FILE) if LIST_FILE.exist?
+    end
     return renew_list(det_root, list)
   end
 
