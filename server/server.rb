@@ -4,7 +4,7 @@ require 'pathname'
 require 'optparse'
 
 
-option = {
+OPTION = option = {
   backend: "thin",
   port: 8000
 }
@@ -19,6 +19,7 @@ parser.on('-s google sheet id and gid', "--sheet-link", "id and gid of Google sh
 parser.on('--lc list.yaml', "--list-with-comments", "List with video comments") {|v| option[:list_with_comments] = v }
 parser.on('-b', "--backend [thin]", "puma thin webrick") {|v| option[:backend] = v }
 parser.on('-p', "--port [8000]", "port") {|v| option[:port] = v }
+parser.on("--performance", "Performance check") {|v| option[:performance] = true }
 
 parser.parse!(ARGV)
 
@@ -34,8 +35,14 @@ parser.parse!(ARGV)
   # puts parser.help
 # end
 
+require 'ruby-prof' if option[:performance]
+
 require_relative 'src/utils'
 require_relative 'src/main'
+
+trap(:INT) {
+  App.stop!
+}
 
 Utils.init(option)
 

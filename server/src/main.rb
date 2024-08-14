@@ -74,6 +74,10 @@ class App < Sinatra::Base
     end
   end
 
+  if defined?(OPTION) && OPTION[:performance] then
+    use Rack::RubyProf, path: 'data/prof', only_paths: [%r{/audio}]
+  end
+
   class << self
     attr_reader :option, :args, :mutex, :id_map
     attr_accessor :restart, :list
