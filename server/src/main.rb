@@ -75,7 +75,7 @@ class App < Sinatra::Base
   end
 
   if defined?(OPTION) && OPTION[:performance] then
-    use Rack::RubyProf, path: 'data/prof', only_paths: [%r{/audio}]
+    use Rack::RubyProf, path: 'data', only_paths: [%r{/audio}]
   end
 
   class << self

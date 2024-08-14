@@ -35,7 +35,7 @@ parser.parse!(ARGV)
   # puts parser.help
 # end
 
-require 'ruby-prof' if option[:performance]
+require_relative 'src/profile' if option[:performance]
 
 require_relative 'src/utils'
 require_relative 'src/main'
