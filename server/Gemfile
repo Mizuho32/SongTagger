@@ -14,6 +14,10 @@ gem 'sorbet-runtime'
 #gem "python-pickle"
 #gem "faye-websocket"
 
+group :performance do
+  gem "ruby-prof"
+end
+
 group :develop do
   gem 'irb'
   gem 'rdoc'
