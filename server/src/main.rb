@@ -270,20 +270,6 @@ class App < Sinatra::Base
     send_file File.join(settings.public_folder, 'index.html')
   end
 
-  get '/api/:api_name' do
-    api_name = params[:api_name]
-    current_port = settings.port
-    query_string = request.query_string
-    uri = URI.parse("http://localhost:#{current_port}/#{api_name}?#{query_string}")
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Get.new(uri.request_uri)
-
-    response = http.request(request)
-    status response.code
-    body response.body
-  end
-
 ## OLD
   get '/tagging' do
     Utils.renew_list(App.list) # FIXME: should not access disk
@@ -397,7 +383,7 @@ class App < Sinatra::Base
   end
 ##
 
-  get '/websocket' do
+  get %r'/(api/)?websocket' do
     if request.websocket?
       request.websocket { |ws|
 
@@ -449,4 +435,18 @@ class App < Sinatra::Base
     end
   end
 
+  get '/api/:api_name' do
+    api_name = params[:api_name]
+    current_port = settings.port
+    query_string = request.query_string
+    uri = URI.parse("http://localhost:#{current_port}/#{api_name}?#{query_string}")
+    puts "proxy #{api_name} to :#{current_port}"
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.request_uri)
+
+    response = http.request(request)
+    status response.code
+    body response.body
+  end
 end
