@@ -9,10 +9,6 @@ table.songlist {
   width: 100%;
   table-layout:auto;
 }
-tr.songlist {
-  /*display: flex;
-  width: 100%;*/
-}
 
 div.songlist.control {
   position: sticky;
