@@ -121,6 +121,8 @@ module SongUtils
         end
 
         if not out_path.exist? then
+            tag_artist = unix_safe_param(tag_artist)
+            title = unix_safe_param(title)
             medatada = "-metadata artist='#{tag_artist}' -metadata album='#{date_str}' -metadata title='#{title}' -metadata track='#{track_num+1}/#{track_size}'"
             filter = ""#%Q|-filter_complex "aevalsrc=0:d=3[silence];[0][silence]concat=n=2:v=0:a=1"|
             # aevalsrc=0:d=3[silence]: 3秒間の無音オーディオを生成します。
@@ -152,6 +154,13 @@ module SongUtils
   end
 
   def unix_safe_filename(name)
-    return name.gsub("/", "／")
+    return name
+      .gsub("/", "／")
+      .gsub("'", "\\'")
+  end
+
+  def unix_safe_param(name)
+    return name
+      .gsub("'", "\\'")
   end
 end
