@@ -6,7 +6,8 @@ require 'optparse'
 
 OPTION = option = {
   backend: "thin",
-  port: 8000
+  port: 8000,
+  bind: "0.0.0.0"
 }
 
 parser = OptionParser.new
@@ -18,7 +19,8 @@ parser.on('-d', "--debug", "Debug mode") { option[:debug] = true }
 parser.on('-s google sheet id and gid', "--sheet-link", "id and gid of Google sheet for commenting") {|v| option[:sheet_link] = v }
 parser.on('--lc list.yaml', "--list-with-comments", "List with video comments") {|v| option[:list_with_comments] = v }
 parser.on('-b', "--backend [thin]", "puma thin webrick") {|v| option[:backend] = v }
-parser.on('-p', "--port [8000]", "port") {|v| option[:port] = v }
+parser.on('-p', "--port [8000]", "port") {|v| option[:port] = v.to_i }
+parser.on("--bind [0.0.0.0]", "bind") {|v| option[:bind] = v }
 parser.on("--performance", "Performance check") {|v| option[:performance] = true }
 
 parser.parse!(ARGV)
@@ -38,24 +40,34 @@ parser.parse!(ARGV)
 require_relative 'src/profile' if option[:performance]
 
 require_relative 'src/utils'
+require_relative 'src/backend'
 require_relative 'src/main'
 
+new_port, audio_backend = Utils.init(option)
+puts "Specified #{option[:port]} but will use #{new_port}"
+
 trap(:INT) {
+  if audio_backend.key?(:io) && audio_backend.key?(:thread) then
+    io = audio_backend[:io]
+    if io.is_a?(IO)
+      io.pid
+      system("kill #{ io.pid }")
+    end
+  end
   App.stop!
 }
 
-Utils.init(option)
 
 catch(:end) do
   loop do
     App.run!(
       option,
-      public_folder: (Pathname(__dir__) / "public"),
-      views:         (Pathname(__dir__) / "views"),
+      public_folder: (Pathname(T.must(__dir__)) / "public"),
+      views:         (Pathname(T.must(__dir__)) / "views"),
       server: option[:backend],
       sockets: [],
-      port: option[:port].to_i,
-      bind: "0.0.0.0",
+      port: new_port,
+      bind: option[:bind],
     )
     throw :end unless App.restart
   end

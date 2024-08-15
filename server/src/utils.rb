@@ -7,8 +7,10 @@ require 'yaml'
 require 'date'
 
 require 'oga'
+require 'sorbet-runtime'
 
 module Utils
+  extend T::Sig
   extend self
   include Kernel
 
@@ -16,9 +18,16 @@ module Utils
   LIST_FILE = Pathname("list.yaml")
   MEDIA_FILES = %w[mp3 wav flac aac ogg m4a]
 
+
+  sig { params(option: T.untyped )
+    .returns([Integer, T::Hash[Symbol, T.any(IO, Thread)]]) }
   def init(option)
-    det_dir = option[:det_root]
-    id_map_file = option[:id_map]
+    det_dir = T.let(option[:det_root], Pathname)
+    id_map_file = T.let(option[:id_map], Pathname)
+    bind = T.let(option[:bind], String)
+    port = T.let(option[:port], Integer)
+
+    new_port, audio_backend = init_audiobackend(bind, port, option)
 
     if !det_dir.exist? || !det_dir.directory? then
       $stderr.puts("No detections dir #{det_dir}")
@@ -26,6 +35,8 @@ module Utils
     elsif id_map_file.exist? then
       option[:id_map] = YAML.load_file(option[:id_map])
     end
+
+    return new_port, audio_backend
   end
 
   # https://qiita.com/TeQuiLayy/items/a74f928426dcb013e1cd
